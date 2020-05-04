@@ -14,7 +14,7 @@ python main.py
 To provide your username and password, change ./data/CRD.pw or type on terminal.
 
 ```
-python main.py yourUsername yourPassword
+python main.py yourAccUsername yourAccPassword
 ```
 
 
