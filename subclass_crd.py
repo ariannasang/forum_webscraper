@@ -4,18 +4,16 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 import os
 
-from webscraper import DataCollection
+from web_scraper import DataCollection
 
 class CRD(DataCollection):
 
 	def __init__(self):
 		self.driver = super().activate_driver()
 
-	def login_site(self):
+	def login_site(self, un, pw):
 		'''Navigate webdriver through the website's account portal.'''
 		doll_site = #hidden
-		un = #hidden
-		pw = #hidden
 
 		self.driver.get(doll_site)
 		self.driver.find_element_by_css_selector('.p-navgroup-link--logIn').click()
