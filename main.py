@@ -18,13 +18,13 @@ def main():
 	c.login_site(un, pw)
 
 	# Get all the text data and meta data from the first community forum
-	sf_df = self.parse_subforums()
-	thread_df, r_threads = self.parse_all_threads(sf_df)
-	complete_df, r_sites = self.parse_text_meta(thread_df, toCSV = True, save_as= 'CRD_df')
+	sf_df = c.parse_subforums()
+	thread_df, r_threads = c.parse_all_threads(sf_df)
+	complete_df, r_sites = c.parse_text_meta(thread_df, toCSV = True, save_as= 'CRD_df')
 	
 	# Save all the threads and sites that were not collected 
 	d = {'Restricted_Threads': r_threads, 'Restricted_Sites': r_sites}
-	self.gen_CSV(d, 'CRD_Restricted_Links')
+	c.gen_CSV(d, 'CRD_Restricted_Links')
 	c.deactivate_driver()
 
 
