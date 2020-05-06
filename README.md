@@ -5,7 +5,7 @@ This webscraper was built to support Professor Mitali Thakor's faculty research 
 
 
 ## Usage
-Get all the auxillary links of the forum + download all text and meta data into a CSV file. 
+Get all the auxiliary links of the forum + download all text and meta data into a CSV file. 
 ```
 git clone https://github.com/ariannasang/forum_webscraper.git
 cd forum_webscraper
