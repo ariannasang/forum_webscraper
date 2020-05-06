@@ -51,7 +51,7 @@ class CRD(DataCollection):
 		return df
 
 	def count_aux_pages(self, link):
-		'''Count the number of auxillary webpages of a link.'''
+		'''Count the number of auxiliary webpages of a link.'''
 
 		self.driver.get(link)
 		css_1 = '.pageNav-jump--next'
@@ -65,7 +65,7 @@ class CRD(DataCollection):
 			return 1
 
 	def aux_pages(self, link, n_aux_pages):
-		'''Generate links for auxilllary webpages of a link.'''
+		'''Generate links for auxiliary webpages of a link.'''
 		counter = 0
 		page_num = 1
 		links = [link]
