@@ -3,7 +3,6 @@ import pandas as pd
 from selenium.common.exceptions import NoSuchElementException   
 import time
 import os
-from itertools import chain
 
 from web_scraper import DataCollection
 
