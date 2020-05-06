@@ -3,6 +3,7 @@ import pandas as pd
 from selenium.common.exceptions import NoSuchElementException   
 import time
 import os
+from itertools import chain
 
 from web_scraper import DataCollection
 
@@ -14,7 +15,7 @@ class CRD(DataCollection):
 	def login_site(self, un, pw):
 		'''Navigate webdriver through the website's account portal.'''
 		doll_site = #hidden
-
+		
 		self.driver.get(doll_site)
 		self.driver.find_element_by_css_selector('.p-navgroup-link--logIn').click()
 		time.sleep(3)
@@ -126,15 +127,14 @@ class CRD(DataCollection):
 		d = {'Subforum_Names': sfNames, 'Thread_Names': tNames, 'Thread_Links': tLinks}
 		df = pd.DataFrame(d)
 
-
 		if toCSV == True:
 			self.gen_CSV(d, save_as)
 
 		return df, problem_sites
 
-	def parse_text_meta(self, df, toCSV = False, save_as = None):
-		''' Collect comments, timestamps, member status and username from thread links.'''
 
+	def parse_text_meta_per_page(self, page_link):
+		''' Collect comments, timestamps, member status and username from a page llink.'''
 		# Containers
 		comments = []
 		timestamps = []
@@ -143,7 +143,7 @@ class CRD(DataCollection):
 		profiles = []
 		problem_sites = []
 
-		# Assign element identifiers
+		#Assign element identifiers
 		thread_identifier = '.p-breadcrumbs:nth-child(1) li:nth-child(4) span'
 		thread_name_identifier = '.p-title-value'
 		comment_identifier = '.js-selectToQuote .bbWrapper'
@@ -151,47 +151,77 @@ class CRD(DataCollection):
 		ms_identifier = '.message-userTitle'
 		profile_identifier = '.message-name .username'
 
+
+		if self.check_exists_by_css(thread_identifier) == True:
+
+			c_elements = self.driver.find_elements_by_css_selector(comment_identifier)
+			t_elements = self.driver.find_elements_by_css_selector(timestamp_identifier)
+			ms_elements = self.driver.find_elements_by_css_selector(ms_identifier)
+			thread_name = self.driver.find_element_by_css_selector(thread_name_identifier)
+			profile_elements = self.driver.find_elements_by_css_selector(profile_identifier)
+
+			if len(c_elements) != len(t_elements):
+				problem_sites.append(page)
+			else:
+				for a in c_elements:
+					comments.append(a.text)
+					tn.append(thread_name.text)
+				for b in t_elements:
+					timestamps.append(b.text)
+				for c in ms_elements:
+					member_status.append(c.text)
+				for d in profile_elements:
+					profiles.append(d.text)
+		else:
+			problem_sites.append(page)
+
+		d = {'Thread_Names': tn, 
+		'Usernames': profiles, 
+		'Member_Status': member_status, 
+		'Timestamps': timestamps, 
+		'Comments': comments 
+		}
+		problem_d = {'Problem_sites': problem_sites}
+
+		return d, problem_d
+
+
+	def parse_all_text_meta(self, df, toCSV = False, save_as = None):
+		''' Collect comments, timestamps, member status and username from thread links.'''
+
+		master_d = {
+		'Thread_Names': [], 
+		'Usernames': [], 
+		'Member_Status': [], 
+		'Timestamps': [], 
+		'Comments': []
+		}
+
+		problem_sites = []
+
 		# Cycle through all thread links
 		for thread_link in df['Thread_Links']:
 
 			if self.is_restricted(thread_link) == True:
 				thread_link = self.correct_restricted(thread_link)
-
 			n_aux_pages = self.count_aux_pages(thread_link)
 			aux_pages = self.aux_pages(thread_link, n_aux_pages)
 
-			#Cycle through all auxillary pages of thread link 
+			# Cycle through all auxillary pages of thread link
 			for page in aux_pages:
-				self.driver.get(page)
-
-				if self.check_exists_by_css(thread_identifier) == True:
-					c_elements = self.driver.find_elements_by_css_selector(comment_identifier)
-					t_elements = self.driver.find_elements_by_css_selector(timestamp_identifier)
-					ms_elements = self.driver.find_elements_by_css_selector(ms_identifier)
-					thread_name = self.driver.find_element_by_css_selector(thread_name_identifier)
-					profile_elements = self.driver.find_elements_by_css_selector(profile_identifier)
-
-					if len(c_elements) != len(t_elements):
-						problem_sites.append(page)
-					else:
-						for a in c_elements:
-							comments.append(a.text)
-							tn.append(thread_name.text)
-						for b in t_elements:
-							timestamps.append(b.text)
-						for c in ms_elements:
-							member_status.append(c.text)
-						for d in profile_elements:
-							profiles.append(d.text)
-				else:
-					problem_sites.append(page)
+				d, p = self.parse_text_meta_per_page(page)
+				master_d['Thread_Names'].extend(d['Thread_Names'])
+				master_d['Usernames'].extend(d['Usernames'])
+				master_d['Member_Status'].extend(d['Member_Status'])
+				master_d['Timestamps'].extend(d['Timestamps'])
+				master_d['Comments'].extend(d['Comments'])
+				problem_sites.extend(p['Problem_sites'])
 
 		print('Scraper complete.')
-		print('LENGTHS- Thread names: {}, Comments: {}, Member status: {}, Timestamps: {}, Usernames: {}').format(len(tn), len(comments). len(member_status), len(timestamps), len(profiles))
-		d = {'Thread_Names': tn, 'Usernames': profiles, 'Member_Status': member_status, 'Timestamps': timestamps, 'Comments': comments }
-		df = pd.DataFrame(d)
+		print(len(master_d['Thread_Names']))
+		df = pd.DataFrame(master_d)
 
 		if toCSV == True:
-			self.gen_CSV(d, save_as)
+			self.gen_CSV(master_d, save_as)
 
-		return df, problem_sites
+		return df, p 
