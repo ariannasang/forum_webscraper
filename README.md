@@ -1,7 +1,7 @@
-# Forum Webscraper
+# Community Forum Webscraper
 Collects comments, user information, and meta data from an online community forum that discusses new child protection laws. *(Site information is protected.)*
 
-This webscraper was built to support Professor Mitali Thakor's faculty research  within the [Science in Society Program](https://www.wesleyan.edu/sisp/) at Wesleyan University. The collected text data will be leveraged to identify ambiguous language in recent child protection laws and to offer revisions to clarify legal documents.
+This webscraper was built to support Professor Mitali Thakor's faculty research  within the [Science in Society Program](https://www.wesleyan.edu/sisp/) at Wesleyan University. The collected text data will be leveraged to identify ambiguous language in recent child protection laws and to offer revisions to clarify legal documents. For current Science in Society Program students interested in participating in this research, please email asang@wesleyan.edu. 
 
 
 ## Usage
